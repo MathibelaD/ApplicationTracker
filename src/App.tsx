@@ -8,6 +8,7 @@ import { seedApplications } from './data/seed'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { MainLayout } from './Layout'
 import { ApplicationDetails } from './components/ApplicationDetails'
+import { NewApplication } from './components/NewApplication'
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             path="/applications/:id"
             element={<ApplicationDetails />}
           />
+          <Route path="/applications/new" element={<NewApplication />} />
 
       </Route>
     </Routes>

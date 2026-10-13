@@ -21,7 +21,7 @@ export const Header = () => {
           </button>
 
           <Link
-            to="/new"
+            to="/applications/new"
             className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
           >
             + Add Application

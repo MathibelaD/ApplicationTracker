@@ -5,15 +5,23 @@ import { ApplicationCard } from './components/ApplicationCard'
 import type { Application } from './types'
 import { ApplicationList } from './components/ApplicationList'
 import { seedApplications } from './data/seed'
+import { BrowserRouter, Route, Routes } from 'react-router'
+import { MainLayout } from './Layout'
 
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-   <h1>Application tracker system</h1>
-   <ApplicationList applications={seedApplications} />
+    <BrowserRouter>
+    <Routes>
+      <Route element={<MainLayout />}>
+      <Route path="/" element={<h1>Welcome back</h1>} />
+          <Route path="/applications" element={<ApplicationList applications={seedApplications}/>} />
+      </Route>
+    </Routes>
+    
+    </BrowserRouter>
     </>
   )
 }

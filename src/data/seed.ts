@@ -8,6 +8,7 @@ export const seedApplications: Application[] = [
     dateSent: "2026-09-15",
     stage: "applied",
     createdAt: new Date().toISOString(),
+    link: "https://opher.io/",
   },
   {
     id: crypto.randomUUID(),

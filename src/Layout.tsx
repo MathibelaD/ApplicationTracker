@@ -4,7 +4,7 @@ export const MainLayout = () => {
   return (
     <div>
       {/* <Header /> */}
-<h1>Welcome to your Application Tracker dashboard</h1>
+{/* <h1>Welcome to your Application Tracker dashboard</h1>÷ */}
       <main>
         <Outlet />
       </main>

@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { Application } from "../types";
 import { StageBadge } from "./StageBadge";
 
@@ -9,6 +10,7 @@ export const ApplicationCard = ({
   application,
 }: ApplicationCardProps) => {
   const {
+    id,
     company,
     role,
     link,
@@ -19,6 +21,7 @@ export const ApplicationCard = ({
 
 
   return (
+    <Link to={`/applications/${id}`}> 
     <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
       <div className="mb-5 flex items-start justify-between">
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-xl font-bold text-indigo-600">
@@ -67,5 +70,6 @@ export const ApplicationCard = ({
         )}
       </div>
     </div>
+    </Link>
   );
 };

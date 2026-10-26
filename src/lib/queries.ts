@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as api from "./api";
-import type { ApplicationInput, AssignmentInput, CvDocument, Screenshot, StageInput } from "./types";
+import type { ApplicationInput, AssignmentInput, CvDocument, Screenshot, StageInput, UserSkill } from "./types";
 
 export const keys = {
   applications: ["applications"] as const,
   documents: ["documents"] as const,
+  skills: ["user-skills"] as const,
 };
 
 export function useApplications() {
@@ -185,5 +186,41 @@ export function useDeleteScreenshot() {
   return useMutation({
     mutationFn: (shot: Pick<Screenshot, "id" | "file_path">) => api.deleteScreenshot(shot),
     onSuccess: () => invalidate("applications"),
+  });
+}
+
+export function useUserSkills() {
+  return useQuery({ queryKey: keys.skills, queryFn: api.fetchUserSkills });
+}
+
+// Skill edits are optimistic so tapping "Add" feels instant; a failure rolls back.
+export function useAddUserSkill() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => api.addUserSkill(name),
+    onMutate: async (name) => {
+      await qc.cancelQueries({ queryKey: keys.skills });
+      const previous = qc.getQueryData<UserSkill[]>(keys.skills);
+      const temp: UserSkill = { id: `temp-${crypto.randomUUID()}`, user_id: "", name: name.trim(), created_at: new Date().toISOString() };
+      qc.setQueryData<UserSkill[]>(keys.skills, (old = []) => [...old, temp]);
+      return { previous };
+    },
+    onError: (_err, _name, ctx) => qc.setQueryData(keys.skills, ctx?.previous),
+    onSettled: () => qc.invalidateQueries({ queryKey: keys.skills }),
+  });
+}
+
+export function useRemoveUserSkill() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.removeUserSkill(id),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: keys.skills });
+      const previous = qc.getQueryData<UserSkill[]>(keys.skills);
+      qc.setQueryData<UserSkill[]>(keys.skills, (old = []) => old.filter((s) => s.id !== id));
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => qc.setQueryData(keys.skills, ctx?.previous),
+    onSettled: () => qc.invalidateQueries({ queryKey: keys.skills }),
   });
 }

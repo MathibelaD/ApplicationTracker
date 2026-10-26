@@ -16,6 +16,8 @@ Built with React 19, Vite, Tailwind CSS v4, React Router, TanStack Query and Sup
      tables, security policies and the private `cvs` storage bucket
    - [`supabase/migrations/20261026010000_screenshots.sql`](supabase/migrations/20261026010000_screenshots.sql) –
      quick add and the private `screenshots` bucket
+   - [`supabase/migrations/20261026020000_user_skills.sql`](supabase/migrations/20261026020000_user_skills.sql) –
+     the "My skills" list
 
    (With the Supabase CLI: `supabase link` then `supabase db push`.)
 3. **Configure auth URLs.** *Authentication → URL Configuration*:
@@ -53,6 +55,12 @@ Built with React 19, Vite, Tailwind CSS v4, React Router, TanStack Query and Sup
 - Stages timeline (screening, interviews, assessments…) with date & time,
   meeting link, outcome and notes; adding a stage moves the status forward
 - Assignments with link, due date & time, progress and notes; overdue ones are flagged
+- Skills insights: reads the saved job descriptions (no AI, nothing leaves the
+  browser) against a built-in list of ~200 skills and their spellings, works out
+  whether each is required, nice to have or just mentioned from the ad's headings
+  and wording, and ranks what your jobs ask for most. A "My skills" list you edit
+  yourself powers a coverage score and biggest-gaps view; each application also
+  shows the skills in its own ad
 - Overview with pipeline, response rate, weekly activity and a "coming up" agenda
   of interviews, assignment deadlines and closing dates
 - List and board views, search, status filters and sorting

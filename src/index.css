@@ -22,6 +22,9 @@
   --warn: #9a4a06;
   --warn-soft: #fdf0d5;
   --chart: #1e4d3b;
+  --tier-required: #1e4d3b;
+  --tier-mentioned: #4a8268;
+  --tier-nice: #8fbaa3;
   color-scheme: light;
 }
 
@@ -45,6 +48,9 @@
   --warn: #fdb022;
   --warn-soft: #33260f;
   --chart: #c4e04f;
+  --tier-required: #d4ee6a;
+  --tier-mentioned: #8fa43a;
+  --tier-nice: #4d5a24;
   color-scheme: dark;
 }
 
@@ -71,6 +77,9 @@
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
   --color-chart: var(--chart);
+  --color-tier-required: var(--tier-required);
+  --color-tier-mentioned: var(--tier-mentioned);
+  --color-tier-nice: var(--tier-nice);
 }
 
 @layer base {

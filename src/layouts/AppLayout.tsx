@@ -7,6 +7,7 @@ import {
   Plus,
   Settings,
   Sun,
+  Target,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -19,6 +20,7 @@ import { useTheme } from "../lib/theme";
 const NAV: { to: string; label: string; icon: LucideIcon; end?: boolean }[] = [
   { to: "/", label: "Overview", icon: LayoutGrid, end: true },
   { to: "/applications", label: "Applications", icon: BriefcaseBusiness },
+  { to: "/skills", label: "Skills", icon: Target },
   { to: "/cvs", label: "My CVs", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
@@ -149,7 +151,7 @@ export function AppLayout() {
         {/* Mobile tab bar */}
         <nav
           aria-label="Main"
-          className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-line bg-bg/90 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1.5 backdrop-blur-md lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-line bg-bg/90 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1.5 backdrop-blur-md lg:hidden"
         >
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink

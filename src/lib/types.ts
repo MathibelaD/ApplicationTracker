@@ -80,6 +80,13 @@ export interface Screenshot {
   created_at: string;
 }
 
+export interface UserSkill {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+}
+
 export interface Application {
   id: string;
   user_id: string;

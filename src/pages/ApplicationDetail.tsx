@@ -19,6 +19,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { AssignmentModal } from "../components/AssignmentModal";
 import { ScreenshotGallery } from "../components/ScreenshotGallery";
+import { AdSkills } from "../components/skills/AdSkills";
 import { StageModal } from "../components/StageModal";
 import { Button } from "../components/ui/Button";
 import { CompanyAvatar } from "../components/ui/CompanyAvatar";
@@ -213,7 +214,7 @@ function Detail({ app }: { app: ApplicationWithRelations }) {
           <StagesSection app={app} />
           <AssignmentsSection app={app} />
           {!incomplete && <ScreenshotGallery applicationId={app.id} screenshots={app.screenshots} />}
-          <DescriptionSection text={app.job_description} />
+          <DescriptionSection app={app} />
         </div>
 
         <aside className="space-y-6">
@@ -702,8 +703,9 @@ function AssignmentsSection({ app }: { app: ApplicationWithRelations }) {
 
 // ---------------------------------------------------------------------------
 
-function DescriptionSection({ text }: { text: string | null }) {
+function DescriptionSection({ app }: { app: ApplicationWithRelations }) {
   const [expanded, setExpanded] = useState(false);
+  const text = app.job_description;
   if (!text) return null;
   const long = text.length > 700;
   return (
@@ -729,6 +731,7 @@ function DescriptionSection({ text }: { text: string | null }) {
           {expanded ? "Show less" : "Show full description"}
         </button>
       )}
+      <AdSkills app={app} />
     </section>
   );
 }

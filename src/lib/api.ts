@@ -10,6 +10,7 @@ import type {
   Screenshot,
   Stage,
   StageInput,
+  UserSkill,
 } from "./types";
 
 function unwrap<T>({ data, error }: { data: T | null; error: { message: string } | null }): T {
@@ -210,4 +211,20 @@ export async function getScreenshotUrls(paths: string[]): Promise<Record<string,
   const map: Record<string, string> = {};
   for (const item of data) if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
   return map;
+}
+
+// ---------------------------------------------------------------------------
+// My skills
+// ---------------------------------------------------------------------------
+
+export async function fetchUserSkills(): Promise<UserSkill[]> {
+  return unwrap(await supabase.from("user_skills").select("*").order("created_at", { ascending: true }));
+}
+
+export async function addUserSkill(name: string): Promise<UserSkill> {
+  return unwrap(await supabase.from("user_skills").insert({ name: name.trim() }).select().single());
+}
+
+export async function removeUserSkill(id: string): Promise<void> {
+  unwrap(await supabase.from("user_skills").delete().eq("id", id));
 }

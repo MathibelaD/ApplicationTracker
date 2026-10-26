@@ -9,6 +9,7 @@ import { Applications } from "./pages/Applications";
 import { Cvs } from "./pages/Cvs";
 import { Dashboard } from "./pages/Dashboard";
 import { Settings } from "./pages/Settings";
+import { Skills } from "./pages/Skills";
 import { ForgotPassword } from "./pages/auth/ForgotPassword";
 import { ResetPassword } from "./pages/auth/ResetPassword";
 import { SignIn } from "./pages/auth/SignIn";
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="applications/new" element={<NewApplicationPage />} />
           <Route path="applications/:id" element={<ApplicationDetail />} />
           <Route path="applications/:id/edit" element={<EditApplicationPage />} />
+          <Route path="skills" element={<Skills />} />
           <Route path="cvs" element={<Cvs />} />
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />

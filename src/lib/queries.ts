@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as api from "./api";
-import type { ApplicationInput, AssignmentInput, CvDocument, Screenshot, StageInput, UserSkill } from "./types";
+import type { ApplicationInput, AssignmentInput, CvDocument, GoalInput, Screenshot, StageInput, UserSkill } from "./types";
 
 export const keys = {
   applications: ["applications"] as const,
   documents: ["documents"] as const,
   skills: ["user-skills"] as const,
+  goals: ["goals"] as const,
 };
 
 export function useApplications() {
@@ -222,5 +223,25 @@ export function useRemoveUserSkill() {
     },
     onError: (_err, _id, ctx) => qc.setQueryData(keys.skills, ctx?.previous),
     onSettled: () => qc.invalidateQueries({ queryKey: keys.skills }),
+  });
+}
+
+export function useGoals() {
+  return useQuery({ queryKey: keys.goals, queryFn: api.fetchGoals });
+}
+
+export function useSaveGoal() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: (input: GoalInput) => api.saveGoal(input),
+    onSuccess: () => invalidate("goals"),
+  });
+}
+
+export function useDeleteGoal() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: api.deleteGoal,
+    onSuccess: () => invalidate("goals"),
   });
 }

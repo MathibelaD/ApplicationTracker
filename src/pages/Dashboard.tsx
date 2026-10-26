@@ -1,8 +1,9 @@
 import { ArrowRight, ArrowUpRight, BriefcaseBusiness, CalendarCheck2, Plus } from "lucide-react";
-import { useMemo } from "react";
-import { Link } from "react-router";
+import { useEffect, useMemo } from "react";
+import { Link, useLocation } from "react-router";
 import { displayName, useAuth } from "../auth/AuthProvider";
 import { ApplicationCard } from "../components/ApplicationCard";
+import { GoalNudge, GoalsPanel } from "../components/goals/GoalsPanel";
 import { NextUpChip } from "../components/NextUpChip";
 import { WeeklyChart } from "../components/WeeklyChart";
 import { CompanyAvatar } from "../components/ui/CompanyAvatar";
@@ -20,6 +21,7 @@ export function Dashboard() {
   const { user } = useAuth();
   const { data: apps = [], isLoading, error, refetch } = useApplications();
   const { change } = useChangeStatus();
+  const { hash } = useLocation();
 
   const stats = useMemo(() => {
     const sent = apps.filter((a) => a.status !== "wishlist");
@@ -36,6 +38,11 @@ export function Dashboard() {
       agenda,
     };
   }, [apps]);
+
+  // Goal badges link to /#goals.
+  useEffect(() => {
+    if (hash === "#goals" && !isLoading) document.getElementById("goals")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [hash, isLoading]);
 
   if (isLoading) return <PageSkeleton />;
   if (error) return <ErrorPanel error={error} onRetry={refetch} />;
@@ -66,6 +73,9 @@ export function Dashboard() {
           Add application
         </Link>
       </header>
+
+      <GoalNudge />
+      <GoalsPanel />
 
       {apps.length === 0 ? (
         <EmptyState

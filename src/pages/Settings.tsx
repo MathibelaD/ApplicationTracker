@@ -1,12 +1,17 @@
-import { LogOut, Monitor, Moon, Sun } from "lucide-react";
+import { LogOut, Monitor, Moon, Pencil, Plus, Sun } from "lucide-react";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useAuth } from "../auth/AuthProvider";
+import { GoalModal } from "../components/goals/GoalModal";
 import { PasswordInput } from "../components/PasswordInput";
 import { Button } from "../components/ui/Button";
-import { Field, Input } from "../components/ui/Field";
+import { Field, Input, Select } from "../components/ui/Field";
 import { errorMessage, useToast } from "../components/ui/Toast";
 import { cardClass, eyebrowClass } from "../components/ui/styles";
+import { goalSummary, PERIOD_ADJECTIVE } from "../lib/goals";
+import { useGoals } from "../lib/queries";
 import { supabase } from "../lib/supabase";
+import type { Goal } from "../lib/types";
+import { setWeekStart, useWeekInfo, type WeekStartPref } from "../lib/useGoalProgress";
 import { useTheme, type ThemePreference } from "../lib/theme";
 
 export function Settings() {
@@ -83,6 +88,10 @@ export function Settings() {
           </form>
         </Row>
 
+        <Row title="Goals" description="How many applications you aim to send.">
+          <GoalsSettings />
+        </Row>
+
         <Row title="Appearance" description="Follow your device, or pick one.">
           <div role="radiogroup" aria-label="Theme" className="grid grid-cols-3 gap-2">
             {themes.map((t) => (
@@ -124,5 +133,54 @@ function Row({ title, description, children }: { title: string; description: str
       </div>
       <div className="min-w-0">{children}</div>
     </section>
+  );
+}
+
+const WEEKDAY = (isoDay: number) =>
+  new Intl.DateTimeFormat(undefined, { weekday: "long" }).format(new Date(2024, 0, isoDay)); // 1 Jan 2024 was a Monday
+
+function GoalsSettings() {
+  const { data: goals = [] } = useGoals();
+  const { pref, regionFirstDay } = useWeekInfo();
+  const [editing, setEditing] = useState<Goal | "new" | null>(null);
+
+  return (
+    <div className="space-y-4">
+      {goals.length > 0 && (
+        <ul className="divide-y divide-line rounded-xl border border-line">
+          {goals.map((g) => (
+            <li key={g.id} className="flex items-center justify-between gap-3 px-4 py-3">
+              <div className="min-w-0">
+                <p className="text-sm font-medium">{PERIOD_ADJECTIVE[g.period]}</p>
+                <p className="truncate text-sm text-ink-3">{goalSummary(g)}</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setEditing(g)}>
+                <Pencil className="size-3.5" aria-hidden /> Edit
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {goals.length < 3 && (
+        <Button variant="secondary" onClick={() => setEditing("new")}>
+          <Plus className="size-4" aria-hidden /> {goals.length ? "Add another goal" : "Set a goal"}
+        </Button>
+      )}
+
+      <Field label="Weeks start on" hint="Used for weekly goals. Saved on this device.">
+        <Select value={pref} onChange={(e) => setWeekStart(e.target.value as WeekStartPref)}>
+          <option value="region">Your region's default ({WEEKDAY(regionFirstDay)})</option>
+          <option value="monday">Monday</option>
+          <option value="sunday">Sunday</option>
+        </Select>
+      </Field>
+
+      <GoalModal
+        open={editing !== null}
+        onClose={() => setEditing(null)}
+        goal={editing && editing !== "new" ? editing : undefined}
+        usedPeriods={goals.map((g) => g.period)}
+      />
+    </div>
   );
 }

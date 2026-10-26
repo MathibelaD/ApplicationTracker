@@ -13,8 +13,10 @@ import {
 import { useEffect } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import { displayName, useAuth } from "../auth/AuthProvider";
+import { GoalBadge } from "../components/goals/GoalBadge";
 import { Logo } from "../components/Logo";
 import { buttonClass } from "../components/ui/styles";
+import { useGoalCelebration } from "../lib/useGoalCelebration";
 import { useTheme } from "../lib/theme";
 
 const NAV: { to: string; label: string; icon: LucideIcon; end?: boolean }[] = [
@@ -30,6 +32,7 @@ export function AppLayout() {
   const { isDark, setTheme } = useTheme();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  useGoalCelebration();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -92,6 +95,7 @@ export function AppLayout() {
         </nav>
 
         <div className="mt-auto space-y-3">
+          <GoalBadge />
           <button
             type="button"
             onClick={() => setTheme(isDark ? "light" : "dark")}
@@ -129,6 +133,7 @@ export function AppLayout() {
             <Logo />
           </Link>
           <div className="flex items-center gap-1">
+            <GoalBadge compact />
             <button
               type="button"
               onClick={() => setTheme(isDark ? "light" : "dark")}

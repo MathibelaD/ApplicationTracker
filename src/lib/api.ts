@@ -10,6 +10,8 @@ import type {
   Screenshot,
   Stage,
   StageInput,
+  Goal,
+  GoalInput,
   UserSkill,
 } from "./types";
 
@@ -227,4 +229,23 @@ export async function addUserSkill(name: string): Promise<UserSkill> {
 
 export async function removeUserSkill(id: string): Promise<void> {
   unwrap(await supabase.from("user_skills").delete().eq("id", id));
+}
+
+// ---------------------------------------------------------------------------
+// Goals
+// ---------------------------------------------------------------------------
+
+export async function fetchGoals(): Promise<Goal[]> {
+  return unwrap(await supabase.from("application_goals").select("*").order("created_at", { ascending: true }));
+}
+
+/** One goal per period: saving a period that exists updates it. */
+export async function saveGoal(input: GoalInput): Promise<Goal> {
+  return unwrap(
+    await supabase.from("application_goals").upsert(input, { onConflict: "user_id,period" }).select().single(),
+  );
+}
+
+export async function deleteGoal(id: string): Promise<void> {
+  unwrap(await supabase.from("application_goals").delete().eq("id", id));
 }

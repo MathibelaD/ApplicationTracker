@@ -80,6 +80,20 @@ export interface Screenshot {
   created_at: string;
 }
 
+export type GoalPeriod = "day" | "week" | "month";
+
+export interface Goal {
+  id: string;
+  user_id: string;
+  period: GoalPeriod;
+  target: number;
+  weekdays_only: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type GoalInput = Pick<Goal, "period" | "target" | "weekdays_only">;
+
 export interface UserSkill {
   id: string;
   user_id: string;

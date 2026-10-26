@@ -18,6 +18,8 @@ Built with React 19, Vite, Tailwind CSS v4, React Router, TanStack Query and Sup
      quick add and the private `screenshots` bucket
    - [`supabase/migrations/20261026020000_user_skills.sql`](supabase/migrations/20261026020000_user_skills.sql) –
      the "My skills" list
+   - [`supabase/migrations/20261026030000_goals.sql`](supabase/migrations/20261026030000_goals.sql) –
+     application goals
 
    (With the Supabase CLI: `supabase link` then `supabase db push`.)
 3. **Configure auth URLs.** *Authentication → URL Configuration*:
@@ -61,6 +63,11 @@ Built with React 19, Vite, Tailwind CSS v4, React Router, TanStack Query and Sup
   and wording, and ranks what your jobs ask for most. A "My skills" list you edit
   yourself powers a coverage score and biggest-gaps view; each application also
   shows the skills in its own ad
+- Application goals: aim for N applications a day (optionally weekdays only), a
+  week or a month. Tracks pace, streaks and recent history from your applied
+  dates, warns you on the Overview when you're falling behind or missed a day,
+  shows a progress ring in the sidebar / phone header, and celebrates when a goal
+  is met. Weeks start on your region's first day, or Monday/Sunday if you prefer
 - Overview with pipeline, response rate, weekly activity and a "coming up" agenda
   of interviews, assignment deadlines and closing dates
 - List and board views, search, status filters and sorting

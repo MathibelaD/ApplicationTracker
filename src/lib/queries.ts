@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as api from "./api";
-import type { ApplicationInput, AssignmentInput, CvDocument, StageInput } from "./types";
+import type { ApplicationInput, AssignmentInput, CvDocument, Screenshot, StageInput } from "./types";
 
 export const keys = {
   applications: ["applications"] as const,
@@ -155,4 +155,35 @@ export async function downloadCv(path: string, fileName: string) {
   document.body.appendChild(a);
   a.click();
   a.remove();
+}
+
+export function useScreenshotUrls(shots: Pick<Screenshot, "file_path">[]) {
+  const paths = shots.map((s) => s.file_path);
+  return useQuery({
+    queryKey: ["screenshot-urls", paths],
+    queryFn: () => api.getScreenshotUrls(paths),
+    enabled: paths.length > 0,
+    staleTime: 50 * 60 * 1000,
+  });
+}
+
+/** Uploads several screenshots; resolves with how many failed instead of throwing. */
+export function useUploadScreenshots() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async ({ userId, applicationId, files }: { userId: string; applicationId: string; files: File[] }) => {
+      const results = await Promise.allSettled(files.map((f) => api.uploadScreenshot(userId, applicationId, f)));
+      const failed = results.filter((r) => r.status === "rejected") as PromiseRejectedResult[];
+      return { uploaded: results.length - failed.length, failed: failed.length, firstError: failed[0]?.reason as Error | undefined };
+    },
+    onSettled: () => invalidate("applications"),
+  });
+}
+
+export function useDeleteScreenshot() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: (shot: Pick<Screenshot, "id" | "file_path">) => api.deleteScreenshot(shot),
+    onSuccess: () => invalidate("applications"),
+  });
 }

@@ -17,7 +17,7 @@ const SAMPLE = [
 
 export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
   return (
-    <div className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
+    <div className="grid grid-cols-1 min-h-dvh lg:grid-cols-[1.05fr_1fr]">
       {/* Brand panel */}
       <aside className="relative hidden overflow-hidden bg-[#161512] p-12 text-[#f1efe8] lg:flex lg:flex-col">
         <div

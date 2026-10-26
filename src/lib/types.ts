@@ -67,11 +67,25 @@ export interface Assignment {
   created_at: string;
 }
 
+export interface Screenshot {
+  id: string;
+  application_id: string;
+  user_id: string;
+  file_path: string;
+  file_name: string | null;
+  file_size: number | null;
+  mime_type: string | null;
+  width: number | null;
+  height: number | null;
+  created_at: string;
+}
+
 export interface Application {
   id: string;
   user_id: string;
-  company: string;
-  role: string;
+  /** Optional for quick-added applications (link and/or screenshot only). */
+  company: string | null;
+  role: string | null;
   location: string | null;
   work_mode: WorkMode | null;
   employment_type: EmploymentType | null;
@@ -94,6 +108,7 @@ export interface ApplicationWithRelations extends Application {
   cv: Pick<CvDocument, "id" | "name" | "file_name" | "file_path"> | null;
   stages: Stage[];
   assignments: Assignment[];
+  screenshots: Screenshot[];
 }
 
 export type ApplicationInput = Omit<

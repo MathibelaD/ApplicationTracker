@@ -10,6 +10,7 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { buttonClass, cardClass, eyebrowClass } from "../components/ui/styles";
 import { buildAgenda, isOverdue, type AgendaItem } from "../lib/agenda";
 import { ACTIVE_STATUSES, STATUS_META, STATUS_ORDER } from "../lib/constants";
+import { companyName, roleTitle } from "../lib/display";
 import { daysUntil, greeting } from "../lib/format";
 import { useApplications } from "../lib/queries";
 import { useChangeStatus } from "../lib/useChangeStatus";
@@ -93,7 +94,7 @@ export function Dashboard() {
 
           <Pipeline apps={apps} />
 
-          <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-start">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-start">
             <Agenda items={stats.agenda} />
 
             <section className={`${cardClass} p-5 sm:p-6`}>
@@ -112,7 +113,7 @@ export function Dashboard() {
                 View all <ArrowRight className="size-4" aria-hidden />
               </Link>
             </div>
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {recent.map((a) => (
                 <ApplicationCard key={a.id} application={a} onStatusChange={(s) => change(a, s)} />
               ))}
@@ -243,13 +244,13 @@ function Agenda({ items }: { items: AgendaItem[] }) {
               <ul className="divide-y divide-line">
                 {g.items.map((item) => (
                   <li key={item.id} className="flex items-center gap-3 py-2.5">
-                    <CompanyAvatar name={item.application.company} size="sm" />
+                    <CompanyAvatar name={companyName(item.application)} size="sm" />
                     <div className="min-w-0 flex-1">
                       <Link
                         to={`/applications/${item.application.id}`}
                         className="block truncate text-sm font-medium hover:underline"
                       >
-                        {item.application.role} · <span className="text-ink-2">{item.application.company}</span>
+                        {roleTitle(item.application)} · <span className="text-ink-2">{companyName(item.application)}</span>
                       </Link>
                       <div className="mt-1">
                         <NextUpChip item={item} />

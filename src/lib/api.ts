@@ -1,4 +1,5 @@
-import { CV_BUCKET, supabase } from "./supabase";
+import { prepareImage } from "./images";
+import { CV_BUCKET, SCREENSHOT_BUCKET, supabase } from "./supabase";
 import type {
   Application,
   ApplicationInput,
@@ -6,6 +7,7 @@ import type {
   Assignment,
   AssignmentInput,
   CvDocument,
+  Screenshot,
   Stage,
   StageInput,
 } from "./types";
@@ -20,7 +22,7 @@ function unwrap<T>({ data, error }: { data: T | null; error: { message: string }
 // ---------------------------------------------------------------------------
 
 const APPLICATION_SELECT =
-  "*, cv:documents(id, name, file_name, file_path), stages:application_stages(*), assignments(*)";
+  "*, cv:documents(id, name, file_name, file_path), stages:application_stages(*), assignments(*), screenshots:job_screenshots(*)";
 
 export async function fetchApplications(): Promise<ApplicationWithRelations[]> {
   const rows = unwrap(
@@ -34,6 +36,7 @@ export async function fetchApplications(): Promise<ApplicationWithRelations[]> {
     ...row,
     stages: [...row.stages].sort(byDate("scheduled_at")),
     assignments: [...row.assignments].sort(byDate("due_at")),
+    screenshots: [...(row.screenshots ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at)),
   }));
 }
 
@@ -53,8 +56,12 @@ export async function updateApplication(id: string, patch: Partial<ApplicationIn
   return unwrap(await supabase.from("applications").update(patch).eq("id", id).select().single());
 }
 
-export async function deleteApplication(id: string): Promise<void> {
-  unwrap(await supabase.from("applications").delete().eq("id", id));
+export async function deleteApplication(app: { id: string; screenshots: Pick<Screenshot, "file_path">[] }): Promise<void> {
+  unwrap(await supabase.from("applications").delete().eq("id", app.id));
+  // Screenshot rows cascade with the application; their files need removing too.
+  if (app.screenshots.length) {
+    await supabase.storage.from(SCREENSHOT_BUCKET).remove(app.screenshots.map((s) => s.file_path));
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -153,4 +160,54 @@ export async function getCvUrl(path: string, download?: string): Promise<string>
     .createSignedUrl(path, 60 * 5, download ? { download } : undefined);
   if (error) throw new Error(error.message);
   return data.signedUrl;
+}
+
+// ---------------------------------------------------------------------------
+// Job listing screenshots
+// ---------------------------------------------------------------------------
+
+export async function uploadScreenshot(userId: string, applicationId: string, original: File): Promise<Screenshot> {
+  const { file, width, height } = await prepareImage(original);
+  const ext = file.type.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
+  const path = `${userId}/${applicationId}/${crypto.randomUUID()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(SCREENSHOT_BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false });
+  if (uploadError) throw new Error(uploadError.message);
+
+  const { data, error } = await supabase
+    .from("job_screenshots")
+    .insert({
+      application_id: applicationId,
+      file_path: path,
+      file_name: original.name,
+      file_size: file.size,
+      mime_type: file.type,
+      width,
+      height,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    await supabase.storage.from(SCREENSHOT_BUCKET).remove([path]);
+    throw new Error(error.message);
+  }
+  return data as Screenshot;
+}
+
+export async function deleteScreenshot(shot: Pick<Screenshot, "id" | "file_path">): Promise<void> {
+  unwrap(await supabase.from("job_screenshots").delete().eq("id", shot.id));
+  await supabase.storage.from(SCREENSHOT_BUCKET).remove([shot.file_path]);
+}
+
+/** Signed URLs keyed by file path, valid for an hour. */
+export async function getScreenshotUrls(paths: string[]): Promise<Record<string, string>> {
+  if (paths.length === 0) return {};
+  const { data, error } = await supabase.storage.from(SCREENSHOT_BUCKET).createSignedUrls(paths, 60 * 60);
+  if (error) throw new Error(error.message);
+  const map: Record<string, string> = {};
+  for (const item of data) if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
+  return map;
 }

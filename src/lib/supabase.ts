@@ -16,3 +16,4 @@ export const supabase: SupabaseClient = isSupabaseConfigured
   : (null as unknown as SupabaseClient);
 
 export const CV_BUCKET = "cvs";
+export const SCREENSHOT_BUCKET = "screenshots";

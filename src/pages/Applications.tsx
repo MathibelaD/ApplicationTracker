@@ -7,6 +7,7 @@ import { Select } from "../components/ui/Field";
 import { buttonClass, eyebrowClass, inputClass } from "../components/ui/styles";
 import { nextUp } from "../lib/agenda";
 import { ACTIVE_STATUSES, STATUS_META, STATUS_ORDER } from "../lib/constants";
+import { companyName } from "../lib/display";
 import { useApplications } from "../lib/queries";
 import type { ApplicationStatus, ApplicationWithRelations } from "../lib/types";
 import { useChangeStatus } from "../lib/useChangeStatus";
@@ -30,7 +31,7 @@ function sortApps(apps: ApplicationWithRelations[], sort: Sort) {
     case "applied":
       return list.sort((a, b) => (b.applied_on ?? "").localeCompare(a.applied_on ?? ""));
     case "company":
-      return list.sort((a, b) => a.company.localeCompare(b.company, undefined, { sensitivity: "base" }));
+      return list.sort((a, b) => companyName(a).localeCompare(companyName(b), undefined, { sensitivity: "base" }));
     case "upcoming": {
       const key = (a: ApplicationWithRelations) => nextUp(a)?.date.getTime() ?? Number.POSITIVE_INFINITY;
       return list.sort((a, b) => key(a) - key(b));
@@ -85,7 +86,7 @@ export function Applications() {
         filter === "all" || (filter === "active" ? ACTIVE_STATUSES.includes(a.status) : a.status === filter);
       if (!statusOk) return false;
       if (!q) return true;
-      return [a.company, a.role, a.location, a.source, a.notes]
+      return [a.company, a.role, a.job_url, a.location, a.source, a.notes]
         .filter(Boolean)
         .some((v) => v!.toLowerCase().includes(q));
     });
@@ -237,7 +238,7 @@ export function Applications() {
                 />
               </div>
             ) : (
-              <ul className="mt-4 grid gap-3">
+              <ul className="mt-4 grid grid-cols-1 gap-3">
                 {visible.map((a) => (
                   <li key={a.id}>
                     <ApplicationCard application={a} onStatusChange={(s) => change(a, s)} />

@@ -43,7 +43,7 @@ export function CvPicker({ documents, value, onChange }: Props) {
   return (
     <div className="space-y-2">
       {documents.length > 0 && (
-        <div role="radiogroup" aria-label="CV used" className="grid gap-2 sm:grid-cols-2">
+        <div role="radiogroup" aria-label="CV used" className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {documents.map((doc) => {
             const active = value.mode === "existing" && value.id === doc.id;
             return (

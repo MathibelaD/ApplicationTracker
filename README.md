@@ -11,10 +11,13 @@ Built with React 19, Vite, Tailwind CSS v4, React Router, TanStack Query and Sup
 ## Setup
 
 1. **Create a Supabase project** at [supabase.com](https://supabase.com).
-2. **Run the schema.** In the dashboard open *SQL Editor*, paste the contents of
-   [`supabase/migrations/20261026000000_init.sql`](supabase/migrations/20261026000000_init.sql)
-   and run it. This creates the tables, security policies and the private `cvs`
-   storage bucket. (With the Supabase CLI: `supabase link` then `supabase db push`.)
+2. **Run the schema.** In the dashboard open *SQL Editor* and run these files, in order:
+   - [`supabase/migrations/20261026000000_init.sql`](supabase/migrations/20261026000000_init.sql) –
+     tables, security policies and the private `cvs` storage bucket
+   - [`supabase/migrations/20261026010000_screenshots.sql`](supabase/migrations/20261026010000_screenshots.sql) –
+     quick add and the private `screenshots` bucket
+
+   (With the Supabase CLI: `supabase link` then `supabase db push`.)
 3. **Configure auth URLs.** *Authentication → URL Configuration*:
    - Site URL: `http://localhost:5173` (your production URL once deployed)
    - Redirect URLs: add `http://localhost:5173/**` and your production URL with `/**`
@@ -40,6 +43,11 @@ Built with React 19, Vite, Tailwind CSS v4, React Router, TanStack Query and Sup
 - Applications with company, role, location, work arrangement, employment type,
   salary, job posting link, source (where you found it), status, date applied,
   closing date, full job description and notes
+- Quick add: save an application with just the job link and a screenshot of the
+  listing (paste with ⌘V / Ctrl+V, drop or browse), and fill in the rest later.
+  Company and source are guessed from common job boards and hiring-platform links
+- Listing screenshots on any application, with a full-size viewer; large images
+  are resized and converted to WebP before upload
 - CV library: upload PDF/Word CVs (private storage), attach the version you used
   to each application, view / download / rename / delete
 - Stages timeline (screening, interviews, assessments…) with date & time,

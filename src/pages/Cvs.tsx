@@ -8,6 +8,7 @@ import { ConfirmDialog, Modal } from "../components/ui/Modal";
 import { errorMessage, useToast } from "../components/ui/Toast";
 import { cardClass, eyebrowClass } from "../components/ui/styles";
 import { validateCvFile } from "../lib/cv";
+import { companyName, roleTitle } from "../lib/display";
 import { formatDate, formatFileSize } from "../lib/format";
 import {
   downloadCv,
@@ -39,7 +40,7 @@ export function Cvs() {
     for (const a of apps) {
       if (!a.cv_id) continue;
       const list = map.get(a.cv_id) ?? [];
-      list.push({ id: a.id, label: `${a.role} · ${a.company}` });
+      list.push({ id: a.id, label: `${roleTitle(a)} · ${companyName(a)}` });
       map.set(a.cv_id, list);
     }
     return map;
@@ -125,11 +126,11 @@ export function Cvs() {
       </div>
 
       {docs.length > 0 && (
-        <ul className="mt-8 grid gap-3 md:grid-cols-2">
+        <ul className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2">
           {docs.map((doc) => {
             const used = usage.get(doc.id) ?? [];
             return (
-              <li key={doc.id} className={`${cardClass} flex flex-col p-4 sm:p-5`}>
+              <li key={doc.id} className={`${cardClass} flex min-w-0 flex-col p-4 sm:p-5`}>
                 <div className="flex items-start gap-3">
                   <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-soft-ink">
                     <FileText className="size-5" aria-hidden />
@@ -151,12 +152,12 @@ export function Cvs() {
                         Used in <span className="font-medium text-ink">{used.length}</span>{" "}
                         {used.length === 1 ? "application" : "applications"}
                       </p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
+                      <div className="mt-2 flex min-w-0 flex-wrap gap-1.5">
                         {used.slice(0, 3).map((u) => (
                           <Link
                             key={u.id}
                             to={`/applications/${u.id}`}
-                            className="max-w-full truncate rounded-md bg-surface-2 px-2 py-1 text-xs text-ink-2 hover:text-ink"
+                            className="inline-block max-w-full truncate rounded-md bg-surface-2 px-2 py-1 text-xs text-ink-2 hover:text-ink"
                           >
                             {u.label}
                           </Link>
@@ -167,18 +168,32 @@ export function Cvs() {
                   )}
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-1 border-t border-line pt-3">
+                <div className="mt-4 flex items-center gap-1 border-t border-line pt-3">
                   <Button variant="ghost" size="sm" onClick={() => act(() => openCv(doc.file_path))}>
                     <Eye className="size-4" aria-hidden /> View
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => act(() => downloadCv(doc.file_path, doc.file_name))}>
                     <Download className="size-4" aria-hidden /> Download
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setRenaming(doc)}>
-                    <Pencil className="size-4" aria-hidden /> Rename
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto max-sm:size-8 max-sm:px-0"
+                    onClick={() => setRenaming(doc)}
+                    aria-label={`Rename ${doc.name}`}
+                    title="Rename"
+                  >
+                    <Pencil className="size-4" aria-hidden /> <span className="max-sm:sr-only">Rename</span>
                   </Button>
-                  <Button variant="dangerGhost" size="sm" className="ml-auto" onClick={() => setDeleting(doc)}>
-                    <Trash2 className="size-4" aria-hidden /> Delete
+                  <Button
+                    variant="dangerGhost"
+                    size="sm"
+                    className="max-sm:size-8 max-sm:px-0"
+                    onClick={() => setDeleting(doc)}
+                    aria-label={`Delete ${doc.name}`}
+                    title="Delete"
+                  >
+                    <Trash2 className="size-4" aria-hidden /> <span className="max-sm:sr-only">Delete</span>
                   </Button>
                 </div>
               </li>

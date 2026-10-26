@@ -13,10 +13,12 @@ import {
   Plus,
   Trash2,
   Video,
+  Zap,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { AssignmentModal } from "../components/AssignmentModal";
+import { ScreenshotGallery } from "../components/ScreenshotGallery";
 import { StageModal } from "../components/StageModal";
 import { Button } from "../components/ui/Button";
 import { CompanyAvatar } from "../components/ui/CompanyAvatar";
@@ -32,6 +34,7 @@ import {
   STATUS_META,
   WORK_MODE_LABEL,
 } from "../lib/constants";
+import { companyName, needsDetails, roleTitle } from "../lib/display";
 import { daysUntil, formatDate, formatDateTime, hostname, relativeDay, toDateInputValue } from "../lib/format";
 import {
   downloadCv,
@@ -74,6 +77,9 @@ function Detail({ app }: { app: ApplicationWithRelations }) {
   const { change, pending } = useChangeStatus();
   const remove = useDeleteApplication();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const company = companyName(app);
+  const role = roleTitle(app);
+  const incomplete = needsDetails(app);
 
   const facts: { label: string; value: ReactNode }[] = [
     {
@@ -117,7 +123,7 @@ function Detail({ app }: { app: ApplicationWithRelations }) {
 
   async function onDelete() {
     try {
-      await remove.mutateAsync(app.id);
+      await remove.mutateAsync(app);
       toast.success("Application deleted");
       navigate("/applications", { replace: true });
     } catch (err) {
@@ -134,10 +140,10 @@ function Detail({ app }: { app: ApplicationWithRelations }) {
       {/* Header */}
       <header className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex gap-4">
-          <CompanyAvatar name={app.company} size="lg" />
+          <CompanyAvatar name={company} size="lg" />
           <div className="min-w-0">
-            <p className="text-[15px] font-medium text-ink-2">{app.company}</p>
-            <h1 className="mt-0.5 font-display text-[36px] leading-[1.05] tracking-tight sm:text-[44px]">{app.role}</h1>
+            <p className="text-[15px] font-medium text-ink-2">{company}</p>
+            <h1 className="mt-0.5 font-display text-[36px] leading-[1.05] tracking-tight sm:text-[44px]">{role}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-2">
               <StatusSelect value={app.status} onChange={(s: ApplicationStatus) => change(app, s)} disabled={pending} />
               {(app.location || app.work_mode) && (
@@ -171,6 +177,26 @@ function Detail({ app }: { app: ApplicationWithRelations }) {
         </div>
       </header>
 
+      {incomplete && (
+        <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-dashed border-line-strong bg-surface-2/60 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex gap-3">
+            <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-lime text-[#14140f]">
+              <Zap className="size-4" aria-hidden />
+            </span>
+            <div>
+              <p className="text-sm font-medium">Quick-added</p>
+              <p className="text-sm text-ink-2">
+                Add the {[!app.company && "company", !app.role && "job title"].filter(Boolean).join(" and ")} so it's easy to
+                find later. Your screenshot has the details.
+              </p>
+            </div>
+          </div>
+          <Link to={`/applications/${app.id}/edit`} className={buttonClass("primary", "md", "shrink-0")}>
+            Complete details
+          </Link>
+        </div>
+      )}
+
       {/* Key facts */}
       <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
         {facts.map((f) => (
@@ -181,10 +207,12 @@ function Detail({ app }: { app: ApplicationWithRelations }) {
         ))}
       </dl>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <div className="min-w-0 space-y-6">
+          {incomplete && <ScreenshotGallery applicationId={app.id} screenshots={app.screenshots} />}
           <StagesSection app={app} />
           <AssignmentsSection app={app} />
+          {!incomplete && <ScreenshotGallery applicationId={app.id} screenshots={app.screenshots} />}
           <DescriptionSection text={app.job_description} />
         </div>
 
@@ -234,8 +262,8 @@ function Detail({ app }: { app: ApplicationWithRelations }) {
         title="Delete this application?"
         description={
           <>
-            <strong className="text-ink">{app.role}</strong> at {app.company}, along with its stages and assignments, will
-            be permanently removed. Your CV stays in your library.
+            <strong className="text-ink">{role}</strong> at {company}, along with its stages, assignments and screenshots,
+            will be permanently removed. Your CV stays in your library.
           </>
         }
       />

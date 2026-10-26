@@ -1,7 +1,8 @@
-import { ArrowUpRight, FileText, MapPin } from "lucide-react";
+import { ArrowUpRight, FileText, Image, MapPin } from "lucide-react";
 import { Link } from "react-router";
 import { nextUp } from "../lib/agenda";
 import { WORK_MODE_LABEL } from "../lib/constants";
+import { companyName, needsDetails, roleTitle } from "../lib/display";
 import { formatDateCompact, hostname, relativeDay } from "../lib/format";
 import type { ApplicationStatus, ApplicationWithRelations } from "../lib/types";
 import { NextUpChip } from "./NextUpChip";
@@ -16,6 +17,9 @@ interface Props {
 
 export function ApplicationCard({ application: app, onStatusChange, compact }: Props) {
   const next = nextUp(app);
+  const company = companyName(app);
+  const role = roleTitle(app);
+  const incomplete = needsDetails(app);
   const place = [app.location, app.work_mode && WORK_MODE_LABEL[app.work_mode]].filter(Boolean).join(" · ");
 
   return (
@@ -25,7 +29,7 @@ export function ApplicationCard({ application: app, onStatusChange, compact }: P
       }`}
     >
       <div className="flex gap-3.5 sm:gap-4">
-        <CompanyAvatar name={app.company} size={compact ? "sm" : "md"} />
+        <CompanyAvatar name={company} size={compact ? "sm" : "md"} />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
@@ -35,14 +39,14 @@ export function ApplicationCard({ application: app, onStatusChange, compact }: P
                   to={`/applications/${app.id}`}
                   className="outline-none after:absolute after:inset-0 after:rounded-2xl focus-visible:after:ring-2 focus-visible:after:ring-accent"
                 >
-                  {app.role}
+                  {role}
                 </Link>
               </h3>
-              <p className="mt-0.5 truncate text-sm text-ink-2">{app.company}</p>
+              <p className="mt-0.5 truncate text-sm text-ink-2">{company}</p>
             </div>
             {!compact && (
               <div className="relative z-10 shrink-0">
-                <StatusSelect value={app.status} onChange={onStatusChange} label={`Status for ${app.role} at ${app.company}`} />
+                <StatusSelect value={app.status} onChange={onStatusChange} label={`Status for ${role} at ${company}`} />
               </div>
             )}
           </div>
@@ -71,6 +75,12 @@ export function ApplicationCard({ application: app, onStatusChange, compact }: P
                   <span className="max-w-40 truncate">{app.cv.name}</span>
                 </span>
               )}
+              {app.screenshots.length > 0 && (
+                <span className="inline-flex items-center gap-1">
+                  <Image className="size-3.5" aria-hidden />
+                  {app.screenshots.length}
+                </span>
+              )}
               {app.job_url && (
                 <a
                   href={app.job_url}
@@ -85,11 +95,20 @@ export function ApplicationCard({ application: app, onStatusChange, compact }: P
             </div>
           )}
 
-          {next && <div className={compact ? "mt-2" : "mt-3"}>{<NextUpChip item={next} />}</div>}
+          {(next || incomplete) && (
+            <div className={`flex flex-wrap gap-1.5 ${compact ? "mt-2" : "mt-3"}`}>
+              {next && <NextUpChip item={next} />}
+              {incomplete && (
+                <span className="inline-flex items-center rounded-lg border border-dashed border-line-strong px-2 py-0.5 text-xs font-medium text-ink-3">
+                  Needs details
+                </span>
+              )}
+            </div>
+          )}
 
           {compact && (
             <div className="relative z-10 mt-2.5">
-              <StatusSelect value={app.status} onChange={onStatusChange} label={`Status for ${app.role} at ${app.company}`} />
+              <StatusSelect value={app.status} onChange={onStatusChange} label={`Status for ${role} at ${company}`} />
             </div>
           )}
         </div>

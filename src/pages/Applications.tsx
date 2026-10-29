@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router";
 import { ApplicationCard } from "../components/ApplicationCard";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Select } from "../components/ui/Field";
+import { Pagination } from "../components/ui/Pagination";
 import { buttonClass, eyebrowClass, inputClass } from "../components/ui/styles";
 import { nextUp } from "../lib/agenda";
 import { ACTIVE_STATUSES, STATUS_META, STATUS_ORDER } from "../lib/constants";
@@ -15,6 +16,8 @@ import { ErrorPanel, PageSkeleton } from "./states";
 
 type Filter = "all" | "active" | ApplicationStatus;
 type Sort = "recent" | "applied" | "upcoming" | "company";
+
+const PAGE_SIZE = 20;
 
 const SORTS: { value: Sort; label: string }[] = [
   { value: "recent", label: "Recently updated" },
@@ -54,7 +57,18 @@ export function Applications() {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);
     else next.delete(key);
+    // A new search, filter or sort starts again from the first page.
+    if (key !== "page") next.delete("page");
     setParams(next, { replace: true });
+  }
+
+  function goToPage(p: number) {
+    const next = new URLSearchParams(params);
+    if (p > 1) next.set("page", String(p));
+    else next.delete("page");
+    // Pages are history entries, so Back returns to the previous page.
+    setParams(next);
+    window.scrollTo({ top: 0 });
   }
 
   // "/" focuses search.
@@ -97,6 +111,12 @@ export function Applications() {
   if (error) return <ErrorPanel error={error} onRetry={refetch} />;
 
   const filters: Filter[] = ["all", "active", ...STATUS_ORDER];
+
+  // Clamped, so a stale ?page= (or the last item moving to another status) never shows an empty page.
+  const pages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+  const page = Math.min(pages, Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1));
+  const pageStart = (page - 1) * PAGE_SIZE;
+  const pageApps = visible.slice(pageStart, pageStart + PAGE_SIZE);
 
   return (
     <div className="animate-rise">
@@ -219,6 +239,11 @@ export function Applications() {
           </div>
 
           <p className="mt-4 text-sm text-ink-3" aria-live="polite">
+            {view === "list" && pages > 1 && (
+              <>
+                Showing {pageStart + 1}–{pageStart + pageApps.length} of{" "}
+              </>
+            )}
             {visible.length} {visible.length === 1 ? "application" : "applications"}
             {query && <> matching “{query}”</>}
           </p>
@@ -238,13 +263,16 @@ export function Applications() {
                 />
               </div>
             ) : (
-              <ul className="mt-4 grid grid-cols-1 gap-3">
-                {visible.map((a) => (
-                  <li key={a.id}>
-                    <ApplicationCard application={a} onStatusChange={(s) => change(a, s)} />
-                  </li>
-                ))}
-              </ul>
+              <>
+                <ul className="mt-4 grid grid-cols-1 gap-3">
+                  {pageApps.map((a) => (
+                    <li key={a.id}>
+                      <ApplicationCard application={a} onStatusChange={(s) => change(a, s)} />
+                    </li>
+                  ))}
+                </ul>
+                <Pagination page={page} pages={pages} onChange={goToPage} className="mt-6" />
+              </>
             )
           ) : (
             <Board apps={visible} onStatusChange={change} />

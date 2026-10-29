@@ -25,6 +25,9 @@
   --tier-required: #1e4d3b;
   --tier-mentioned: #4a8268;
   --tier-nice: #8fbaa3;
+  /* Skill map: have vs gap. Validated pair (CVD ΔE 24.7 on #fff). */
+  --chart-have: #2a78d6;
+  --chart-gap: #eb6834;
   color-scheme: light;
 }
 
@@ -51,6 +54,8 @@
   --tier-required: #d4ee6a;
   --tier-mentioned: #8fa43a;
   --tier-nice: #4d5a24;
+  --chart-have: #3987e5;
+  --chart-gap: #d95926;
   color-scheme: dark;
 }
 
@@ -80,6 +85,8 @@
   --color-tier-required: var(--tier-required);
   --color-tier-mentioned: var(--tier-mentioned);
   --color-tier-nice: var(--tier-nice);
+  --color-chart-have: var(--chart-have);
+  --color-chart-gap: var(--chart-gap);
 }
 
 @layer base {

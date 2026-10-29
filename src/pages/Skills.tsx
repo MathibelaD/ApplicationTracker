@@ -1,8 +1,10 @@
 import { ChevronDown, Info, ScanText } from "lucide-react";
 import { useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 import { Link } from "react-router";
 import { MySkillsEditor } from "../components/skills/MySkillsEditor";
 import { HaveToggle, TierLegend } from "../components/skills/SkillBits";
+import { SkillMap } from "../components/skills/SkillMap";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Segmented, Select } from "../components/ui/Field";
 import { buttonClass, cardClass, eyebrowClass } from "../components/ui/styles";
@@ -29,6 +31,14 @@ export function Skills() {
   const [scope, setScope] = useState<SkillScope>("all");
   const { data, isLoading, error, refetch } = useSkillInsights(scope);
   const { data: mySkills = [] } = useUserSkills();
+  // Picking a dot on the map remounts the list with that skill open and every filter cleared.
+  const [jump, setJump] = useState<{ id: string; n: number } | null>(null);
+
+  function showSkill(id: string) {
+    flushSync(() => setJump((j) => ({ id, n: (j?.n ?? 0) + 1 })));
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById(`skill-${id}`)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  }
 
   if (isLoading || !data) return error ? <ErrorPanel error={error} onRetry={refetch} /> : <PageSkeleton rows={5} />;
 
@@ -102,7 +112,8 @@ export function Skills() {
               <div className="lg:hidden">
                 <Coverage stats={analysis.stats} mine={mine} analysed={n} />
               </div>
-              <RankedList stats={analysis.stats} mine={mine} analysed={n} />
+              <SkillMap stats={analysis.stats} mine={mine} analysed={n} onSelect={showSkill} />
+              <RankedList key={jump?.n ?? 0} focusId={jump?.id} stats={analysis.stats} mine={mine} analysed={n} />
             </>
           )}
         </div>
@@ -176,13 +187,27 @@ function Coverage({ stats, mine, analysed }: { stats: SkillStat[]; mine: Map<str
 
 // ---------------------------------------------------------------------------
 
-function RankedList({ stats, mine, analysed }: { stats: SkillStat[]; mine: Map<string, UserSkill>; analysed: number }) {
+function RankedList({
+  stats,
+  mine,
+  analysed,
+  focusId,
+}: {
+  stats: SkillStat[];
+  mine: Map<string, UserSkill>;
+  analysed: number;
+  /** Skill to start expanded, with enough rows shown to include it. */
+  focusId?: string;
+}) {
   const toggle = useToggleSkill();
   const { data: apps = [] } = useApplications();
   const [view, setView] = useState<View>("all");
   const [category, setCategory] = useState<SkillCategory | "custom" | "">("");
-  const [limit, setLimit] = useState(PAGE);
-  const [open, setOpen] = useState<string | null>(null);
+  const [limit, setLimit] = useState(() => {
+    const rank = focusId ? stats.findIndex((s) => s.id === focusId) + 1 : 0;
+    return Math.max(PAGE, Math.ceil(rank / PAGE) * PAGE);
+  });
+  const [open, setOpen] = useState<string | null>(focusId ?? null);
 
   const appsById = useMemo(() => new Map(apps.map((a) => [a.id, a])), [apps]);
   const categories = useMemo(() => [...new Set(stats.map((s) => s.category))], [stats]);
@@ -266,7 +291,7 @@ function RankedList({ stats, mine, analysed }: { stats: SkillStat[]; mine: Map<s
             const pct = Math.round((s.jobs / analysed) * 100);
             const expanded = open === s.id;
             return (
-              <li key={s.id} className="-mx-2 rounded-xl px-2 py-2.5 transition hover:bg-surface-2/60">
+              <li key={s.id} id={`skill-${s.id}`} className="-mx-2 rounded-xl px-2 py-2.5 transition hover:bg-surface-2/60">
                 <div className="flex items-center gap-3">
                   <span className="w-6 shrink-0 text-right text-xs tabular-nums text-ink-3">{rank}</span>
                   <div className="min-w-0 flex-1">

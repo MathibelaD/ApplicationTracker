@@ -13,7 +13,7 @@ export function Logo() {
   return (
     <span className="inline-flex items-center gap-2.5">
       <LogoMark />
-      <span className="font-display text-[22px] leading-none tracking-tight">Shortlist</span>
+      <span className="font-display text-[22px] leading-none tracking-tight">SmartWebSync Application Tracker</span>
     </span>
   );
 }

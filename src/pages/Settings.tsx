@@ -114,7 +114,7 @@ export function Settings() {
           </div>
         </Row>
 
-        <Row title="Session" description="Sign out of Shortlist on this device.">
+        <Row title="Session" description="Sign out of SmartWebSync Application Tracker on this device.">
           <Button variant="secondary" onClick={signOut}>
             <LogOut className="size-4" aria-hidden /> Sign out
           </Button>

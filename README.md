@@ -1,8 +1,8 @@
-# Shortlist
+# SmartWebSync Application Tracker
 
 **A job application tracker that remembers everything about every job you apply for, and helps you keep applying.**
 
-Job hunting quickly gets messy. The ad you applied to disappears the week before your interview. You can't remember which version of your CV you sent. Interview times, take-home deadlines and closing dates are scattered across emails and notes. Shortlist keeps all of it in one place, for every application, from the moment you see a job to the final offer or rejection.
+Job hunting quickly gets messy. The ad you applied to disappears the week before your interview. You can't remember which version of your CV you sent. Interview times, take-home deadlines and closing dates are scattered across emails and notes. SmartWebSync Application Tracker keeps all of it in one place, for every application, from the moment you see a job to the final offer or rejection.
 
 It's a multi-user web app: anyone can create an account, and each person's applications, CVs and screenshots are private to them.
 
@@ -31,12 +31,12 @@ It's a multi-user web app: anyone can create an account, and each person's appli
 
 ### Learn what employers keep asking for
 - **Skills insights** read the job descriptions you've saved and rank the skills that come up most, split into **required**, **nice to have** and **just mentioned**.
-- Keep a **"My skills"** list and Shortlist shows your **coverage** of the most-requested skills and your **biggest gaps**.
+- Keep a **"My skills"** list and SmartWebSync Application Tracker shows your **coverage** of the most-requested skills and your **biggest gaps**.
 - Each application also shows the skills in its own ad, with how many of the required ones you already have.
 
 ### Stay consistent
 - **Application goals:** set a target such as "2 a day, weekdays only" or "10 a week".
-- Shortlist tracks your pace, streaks and recent history, and **tells you when you're falling behind** or missed a day, with a nudge on the dashboard and a progress ring that's always visible. It celebrates when you hit the goal.
+- SmartWebSync Application Tracker tracks your pace, streaks and recent history, and **tells you when you're falling behind** or missed a day, with a nudge on the dashboard and a progress ring that's always visible. It celebrates when you hit the goal.
 
 ---
 

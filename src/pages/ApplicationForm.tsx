@@ -404,7 +404,7 @@ function ApplicationForm({
       } else {
         const created = await create.mutateAsync(payload);
         await saveScreenshots(created.id, files);
-        toast.success(`${companyName(created)} added to your shortlist`);
+        toast.success(`${companyName(created)} added to your SmartWebSync Application Tracker`);
         navigate(`/applications/${created.id}`);
       }
     } catch (err) {

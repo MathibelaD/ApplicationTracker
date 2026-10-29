@@ -60,7 +60,7 @@ export function SignUp() {
 
   return (
     <AuthLayout
-      title="Start your shortlist"
+      title="Start your SmartWebSync Application Tracker"
       subtitle="Free, private, and only you can see your applications."
       footer={
         <>

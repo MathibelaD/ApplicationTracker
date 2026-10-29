@@ -129,7 +129,7 @@ export function AppLayout() {
       <div className="min-w-0">
         {/* Mobile top bar */}
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-bg/85 px-4 py-3 backdrop-blur-md lg:hidden">
-          <Link to="/" aria-label="Shortlist home">
+          <Link to="/" aria-label="SmartWebSync Application Tracker home">
             <Logo />
           </Link>
           <div className="flex items-center gap-1">

@@ -80,8 +80,8 @@ export function Dashboard() {
       {apps.length === 0 ? (
         <EmptyState
           icon={BriefcaseBusiness}
-          title="Your shortlist is empty"
-          description="Add a job you've applied for (or want to). Paste the link, attach the CV you used, and Shortlist will keep track of the dates for you."
+          title="Your SmartWebSync Application Tracker is empty"
+          description="Add a job you've applied for (or want to). Paste the link, attach the CV you used, and SmartWebSync Application Tracker will keep track of the dates for you."
           action={
             <Link to="/applications/new" className={buttonClass("primary")}>
               <Plus className="size-4" aria-hidden /> Add your first application
